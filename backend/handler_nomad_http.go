@@ -121,7 +121,12 @@ func (hs *httpSocket) ReadJSON(v interface{}) error {
 // NomadAPIHandler establishes the websocket connection and calls the connection handler.
 func NomadAPIHandler(cfg *config.Config, nomadClient *nomad.Client, consulClient *consul.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		connectionID := uuid.NewV4()
+		connectionID, err := uuid.NewV4()
+		if err != nil {
+			log.Errorf("UUID failed: %s", err)
+			return
+		}
+
 		logger := log.WithField("connection_id", connectionID.String()[:8])
 		logger.Debugf("transport: connection created")
 

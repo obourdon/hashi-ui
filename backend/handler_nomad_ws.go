@@ -25,7 +25,12 @@ const (
 // NomadHandler establishes the websocket connection and calls the connection handler.
 func NomadHandler(cfg *config.Config, nomadClient *nomad.Client, consulClient *consul.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		connectionID := uuid.NewV4()
+		connectionID, err := uuid.NewV4()
+		if err != nil {
+			log.Errorf("UUID failed: %s", err)
+			return
+		}
+
 		logger := log.WithField("connection_id", connectionID.String()[:8])
 		logger.Debugf("transport: connection created")
 
@@ -84,7 +89,12 @@ func requireNomadRegion(socket *websocket.Conn, client *nomad.Client, logger *lo
 // NomadDownloadFile ...
 func NomadDownloadFile(cfg *config.Config) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		connectionID := uuid.NewV4()
+		connectionID, err := uuid.NewV4()
+		if err != nil {
+			log.Errorf("UUID failed: %s", err)
+			return
+		}
+
 		logger := log.WithField("connection_id", connectionID.String()[:8])
 
 		params := mux.Vars(r)
